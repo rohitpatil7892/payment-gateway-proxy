@@ -1,7 +1,7 @@
 import { LLMService } from '../../src/services/llm.service';
 import { createMockTransaction, createMockRiskAssessment } from '../utils/test-helpers';
 import { MockCacheService, MockCircuitBreaker } from '../utils/mock-services';
-import { RiskAssessment } from '../../src/types';
+import { TransactionStatus, RiskAssessment } from '../../src/types';
 
 // Mock axios
 jest.mock('axios');
@@ -144,7 +144,7 @@ describe('LLMService', () => {
         const cacheKey = `risk_assessment:${transaction.id}`;
         const cachedResult = await mockCacheService.get(cacheKey);
         expect(cachedResult).toBeDefined();
-        expect(cachedResult.riskLevel).toBe('LOW');
+        expect((cachedResult as RiskAssessment).riskLevel).toBe('LOW');
       });
 
       it('should publish risk assessed event', async () => {
@@ -275,16 +275,12 @@ describe('LLMService', () => {
     describe('Prompt Building', () => {
       it('should build comprehensive risk assessment prompt', async () => {
         const transaction = createMockTransaction({
-          amount: 50000, // $500
-          currency: 'EUR',
-          paymentMethod: {
-            type: 'digital_wallet',
-            walletId: 'wallet_test123'
-          },
-          metadata: {
-            orderId: 'order_12345',
-            ipAddress: '192.168.1.1'
-          }
+          id: 'txn_mock-uuid-1234',
+          status: TransactionStatus.PROCESSING,
+          amount: 10000,
+          currency: 'USD',
+          email: 'test@example.com',
+          source: 'test-source'
         });
 
         const mockOpenAIResponse = {
@@ -312,15 +308,15 @@ describe('LLMService', () => {
             messages: expect.arrayContaining([
               expect.objectContaining({
                 role: 'user',
-                content: expect.stringContaining('50000 EUR')
+                content: expect.stringContaining('10000 USD')
               }),
               expect.objectContaining({
                 role: 'user',
-                content: expect.stringContaining('digital_wallet')
+                content: expect.stringContaining('test-source')
               }),
               expect.objectContaining({
                 role: 'user',
-                content: expect.stringContaining('order_12345')
+                content: expect.stringContaining('test@example.com')
               })
             ])
           })

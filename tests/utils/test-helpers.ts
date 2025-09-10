@@ -1,4 +1,4 @@
-import { Transaction, TransactionStatus, PaymentMethod, RiskAssessment } from '../../src/types';
+import { Transaction, TransactionStatus, RiskAssessment } from '../../src/types';
 import { generateTransactionId } from '../../src/utils/uuid';
 import { generateToken } from '../../src/utils/jwt';
 
@@ -7,44 +7,11 @@ export const createMockTransaction = (overrides?: Partial<Transaction>): Transac
     id: generateTransactionId(),
     amount: 10000, // $100.00
     currency: 'USD',
-    merchantId: 'merchant_123',
-    customerId: 'customer_456',
-    paymentMethod: {
-      type: 'card',
-      cardNumber: '4111111111111111',
-      expiryMonth: '12',
-      expiryYear: '2025',
-      cvv: '123'
-    },
-    metadata: {},
+    source: 'test-source',
+    email: 'test@example.com',
     status: TransactionStatus.PENDING,
     createdAt: new Date(),
     updatedAt: new Date(),
-    ...overrides
-  };
-};
-
-export const createMockPaymentMethod = (type: 'card' | 'bank_transfer' | 'digital_wallet', overrides?: Partial<PaymentMethod>): PaymentMethod => {
-  const baseMethods = {
-    card: {
-      type: 'card' as const,
-      cardNumber: '4111111111111111',
-      expiryMonth: '12',
-      expiryYear: '2025',
-      cvv: '123'
-    },
-    bank_transfer: {
-      type: 'bank_transfer' as const,
-      bankAccount: '12345678901234567890'
-    },
-    digital_wallet: {
-      type: 'digital_wallet' as const,
-      walletId: 'wallet_abc123'
-    }
-  };
-
-  return {
-    ...baseMethods[type],
     ...overrides
   };
 };
@@ -77,24 +44,8 @@ export const createValidPaymentRequest = (overrides?: any) => {
   return {
     amount: 10000,
     currency: 'USD',
-    paymentMethod: {
-      type: 'card',
-      cardNumber: '4111111111111111',
-      expiryMonth: '12',
-      expiryYear: '2025',
-      cvv: '123'
-    },
-    customer: {
-      id: 'customer_123',
-      email: 'test@example.com'
-    },
-    merchant: {
-      id: 'merchant_456'
-    },
-    metadata: {
-      orderId: 'order_789',
-      source: 'test'
-    },
+    source: 'test-source',
+    email: 'test@example.com',
     ...overrides
   };
 };
@@ -118,7 +69,7 @@ export const delay = (ms: number): Promise<void> => {
 export const expectValidTransactionResponse = (response: any) => {
   expect(response.success).toBe(true);
   expect(response.data.transactionId).toMatch(/^txn_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
-  expect(response.data.status).toMatch(/^(PENDING|PROCESSING|COMPLETED|FAILED)$/);
+  expect(response.data.status).toMatch(/^(PENDING|PROCESSING|SUCCESS|FAILED)$/);
 };
 
 export const expectValidRiskAssessment = (riskAssessment: any) => {
@@ -142,45 +93,20 @@ export const expectValidErrorResponse = (response: any, expectedStatus?: number)
 export const TestData = {
   // Valid test cases
   validCardPayment: createValidPaymentRequest(),
-  validBankTransferPayment: createValidPaymentRequest({
-    paymentMethod: {
-      type: 'bank_transfer',
-      bankAccount: '12345678901234567890'
-    }
-  }),
-  validDigitalWalletPayment: createValidPaymentRequest({
-    paymentMethod: {
-      type: 'digital_wallet',
-      walletId: 'wallet_abc123'
-    }
-  }),
   
   // High risk scenarios
   highAmountPayment: createValidPaymentRequest({ amount: 500000 }), // $5000
-  weekendPayment: createValidPaymentRequest({
-    metadata: { isWeekend: true }
-  }),
+  weekendPayment: createValidPaymentRequest({ source: 'weekend' }),
   
   // Invalid test cases
   invalidAmountPayment: createValidPaymentRequest({ amount: -100 }),
   invalidCurrencyPayment: createValidPaymentRequest({ currency: 'INVALID' }),
-  missingPaymentMethodPayment: { ...createValidPaymentRequest(), paymentMethod: undefined },
-  invalidEmailPayment: createValidPaymentRequest({
-    customer: { id: 'customer_123', email: 'invalid-email' }
-  }),
+  missingSourcePayment: { ...createValidPaymentRequest(), source: undefined },
+  invalidEmailPayment: createValidPaymentRequest({ email: 'invalid-email' }),
   
   // Edge cases
   zeroAmountPayment: createValidPaymentRequest({ amount: 0 }),
   maxAmountPayment: createValidPaymentRequest({ amount: 1000000 }),
-  expiredCardPayment: createValidPaymentRequest({
-    paymentMethod: {
-      type: 'card',
-      cardNumber: '4111111111111111',
-      expiryMonth: '01',
-      expiryYear: '2020',
-      cvv: '123'
-    }
-  }),
   
   // Authentication test cases
   validAuthCredentials: createValidAuthRequest(),

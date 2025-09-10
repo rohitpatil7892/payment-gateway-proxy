@@ -80,14 +80,7 @@ describe('PaymentController', () => {
           id: 'txn_mock-uuid-1234',
           status: TransactionStatus.PROCESSING,
           amount: paymentRequest.amount,
-          currency: paymentRequest.currency,
-          metadata: {
-            riskAssessment: {
-              riskLevel: 'LOW',
-              riskScore: 0.2,
-              explanation: 'Low risk transaction'
-            }
-          }
+          currency: paymentRequest.currency
         });
 
         (paymentService.processTransaction as jest.Mock).mockResolvedValue(mockProcessedTransaction);
@@ -211,7 +204,7 @@ describe('PaymentController', () => {
 
         const mockTransaction = createMockTransaction({
           id: transactionId,
-          status: TransactionStatus.COMPLETED
+          status: TransactionStatus.SUCCESS
         });
 
         // Set up the transaction in controller's memory
@@ -224,7 +217,7 @@ describe('PaymentController', () => {
           success: true,
           data: {
             transactionId: transactionId,
-            status: TransactionStatus.COMPLETED,
+            status: TransactionStatus.SUCCESS,
             amount: mockTransaction.amount,
             currency: mockTransaction.currency,
             createdAt: mockTransaction.createdAt,
@@ -239,7 +232,7 @@ describe('PaymentController', () => {
 
         const mockTransaction = createMockTransaction({
           id: transactionId,
-          status: TransactionStatus.COMPLETED
+          status: TransactionStatus.SUCCESS
         });
 
         // Set up cache to return the transaction
@@ -253,7 +246,7 @@ describe('PaymentController', () => {
             success: true,
             data: expect.objectContaining({
               transactionId: transactionId,
-              status: TransactionStatus.COMPLETED
+              status: TransactionStatus.SUCCESS
             })
           })
         );
