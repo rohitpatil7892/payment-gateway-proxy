@@ -1,0 +1,16 @@
+# Ignore node modules
+node_modules
+
+# Ignore build artifacts
+dist
+build
+coverage
+
+# Ignore logs and temp files
+logs
+*.log
+*.tsbuildinfo
+
+# Ignore local env and configs
+.env*
+Dockerfile*
