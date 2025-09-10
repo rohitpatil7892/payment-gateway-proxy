@@ -1,19 +1,21 @@
-FROM node:18-alpine
+FROM node:20-alpine
 
 # Set working directory
 WORKDIR /app
 
 # Install dependencies first (for better caching)
 COPY package*.json ./
-RUN npm ci --only=production && npm cache clean --force
+RUN npm install
 
 # Create non-root user
 RUN addgroup -g 1001 -S nodejs && \
     adduser -S nodejs -u 1001
 
-# Copy built application
-COPY dist/ ./dist/
-COPY logs/ ./logs/
+# Copy source and build inside the container
+COPY . .
+
+# Build TypeScript to dist/
+RUN npm run build && npm prune --production && mkdir -p logs
 
 # Set ownership
 RUN chown -R nodejs:nodejs /app

@@ -25,3 +25,14 @@ export const processPaymentSchema = Joi.object({
       'string.email': 'Email must be a valid email address'
     })
 });
+
+export const transactionIdParam = Joi.string()
+  .pattern(/^txn_[A-Za-z0-9-]{20,}$/)
+  .required()
+  .messages({
+    'string.pattern.base': 'Invalid transaction ID format'
+  });
+
+export const assessRiskSchema = Joi.object({
+  transactionId: transactionIdParam
+});
