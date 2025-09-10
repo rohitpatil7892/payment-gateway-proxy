@@ -1,0 +1,108 @@
+# Fraud Detection Rules Configuration
+# This file contains configurable heuristics for fraud detection
+
+# Risk thresholds for scoring
+thresholds:
+  low: 0.3
+  medium: 0.6
+  high: 0.8
+  critical: 0.9
+
+# Payment provider configurations
+providers:
+  - name: "paypal"
+    priority: 1
+    riskTolerance: "medium"
+    enabled: true
+  - name: "stripe"
+    priority: 2
+    riskTolerance: "low"
+    enabled: true
+  - name: "square"
+    priority: 3
+    riskTolerance: "high"
+    enabled: true
+
+# Fraud detection rules
+rules:
+  - name: "high_amount_rule"
+    enabled: true
+    weight: 0.3
+    action: "flag"
+    conditions:
+      - field: "amount"
+        operator: "gt"
+        value: 100000
+        description: "Transaction amount exceeds $1000"
+
+  - name: "suspicious_email_domain"
+    enabled: true
+    weight: 0.4
+    action: "block"
+    conditions:
+      - field: "email"
+        operator: "contains"
+        value: "@tempmail."
+        description: "Email from temporary mail service"
+      - field: "email"
+        operator: "contains"
+        value: "@10minutemail."
+        description: "Email from temporary mail service"
+
+  - name: "weekend_transaction"
+    enabled: true
+    weight: 0.1
+    action: "flag"
+    conditions:
+      - field: "timestamp"
+        operator: "eq"
+        value: "weekend"
+        description: "Transaction initiated during weekend"
+
+  - name: "rapid_succession_rule"
+    enabled: true
+    weight: 0.5
+    action: "review"
+    conditions:
+      - field: "email_frequency"
+        operator: "gt"
+        value: 5
+        description: "More than 5 transactions from same email in last hour"
+
+  - name: "known_fraud_source"
+    enabled: true
+    weight: 0.8
+    action: "block"
+    conditions:
+      - field: "source"
+        operator: "regex"
+        value: "^(tok_fraud|tok_stolen).*"
+        description: "Source token flagged as fraudulent"
+
+  - name: "large_round_amount"
+    enabled: true
+    weight: 0.2
+    action: "flag"
+    conditions:
+      - field: "amount"
+        operator: "regex"
+        value: "\\d+00000$"
+        description: "Large round amounts often indicate fraud"
+
+  - name: "unusual_currency_pair"
+    enabled: true
+    weight: 0.3
+    action: "review"
+    conditions:
+      - field: "currency"
+        operator: "eq"
+        value: "USD"
+        description: "USD transactions from certain regions require review"
+
+# Global settings
+settings:
+  default_provider: "paypal"
+  fallback_provider: "stripe"
+  max_risk_score: 1.0
+  enable_llm_override: true
+  cache_assessment_hours: 24

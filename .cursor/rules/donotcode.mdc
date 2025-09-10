@@ -1,0 +1,4 @@
+---
+alwaysApply: false
+---
+Do not generate code unless I explicitly say 'write code' or 'start coding'.
