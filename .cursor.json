@@ -1,0 +1,228 @@
+{
+  "name": "Payment Gateway Proxy",
+  "description": "Mini Payment Gateway Proxy with LLM Risk Assessment and Fraud Detection",
+  "version": "1.0.0",
+  "type": "typescript-express-api",
+  
+  "rules": [
+    "This is a TypeScript Express.js payment gateway proxy service",
+    "The application handles payment processing with fraud detection and risk assessment",
+    "Uses LLM services for intelligent risk analysis and fraud pattern detection",
+    "Implements circuit breaker patterns for resilience",
+    "Redis is used for caching and session management",
+    "All API endpoints are documented with Swagger/OpenAPI",
+    "Authentication is JWT-based with role-based access control",
+    "Error handling follows centralized middleware patterns",
+    "Code follows strict TypeScript typing and validation schemas",
+    "Testing includes both unit and integration tests with Jest",
+    "Logging is handled by Winston with structured formats",
+    "Docker containerization is available for deployment"
+  ],
+
+  "include": [
+    "src/**/*.ts",
+    "tests/**/*.ts",
+    "*.json",
+    "*.yml",
+    "*.yaml",
+    "*.md",
+    "Dockerfile",
+    "docker-compose.yml"
+  ],
+
+  "exclude": [
+    "node_modules/**/*",
+    "dist/**/*",
+    "logs/**/*",
+    "*.log",
+    "*.js.map",
+    "*.d.ts.map",
+    "coverage/**/*"
+  ],
+
+  "docs": {
+    "apiDocumentation": "/docs",
+    "readme": "README.md",
+    "requirements": "requirement/",
+    "swagger": {
+      "url": "http://localhost:3000/docs",
+      "spec": "http://localhost:3000/swagger.json"
+    }
+  },
+
+  "projectStructure": {
+    "src/": "Main source code directory",
+    "src/app.ts": "Express application entry point with middleware setup",
+    "src/config/": "Configuration files for Redis, Swagger, and fraud rules",
+    "src/controllers/": "HTTP request handlers for auth and payment endpoints",
+    "src/middleware/": "Express middleware for auth, validation, and error handling",
+    "src/routes/": "API route definitions for authentication and payments",
+    "src/services/": "Business logic services (payment processing, LLM, caching)",
+    "src/schemas/": "Joi validation schemas for request/response validation",
+    "src/types/": "TypeScript type definitions and interfaces",
+    "src/utils/": "Utility functions (circuit breaker, logging, JWT, retry logic)",
+    "tests/": "Test suites (unit and integration tests)",
+    "config/": "External configuration files (fraud detection rules)",
+    "dist/": "Compiled JavaScript output (build artifacts)",
+    "logs/": "Application log files"
+  },
+
+  "keyComponents": {
+    "authentication": {
+      "files": [
+        "src/controllers/auth.controller.ts",
+        "src/routes/auth.routes.ts",
+        "src/middleware/auth.middleware.ts",
+        "src/utils/jwt.ts"
+      ],
+      "description": "JWT-based authentication system with role-based access control"
+    },
+    "paymentProcessing": {
+      "files": [
+        "src/controllers/payment.controller.ts",
+        "src/routes/payment.routes.ts",
+        "src/services/payment.service.ts",
+        "src/schemas/payment.schemas.ts"
+      ],
+      "description": "Core payment processing logic with validation and error handling"
+    },
+    "fraudDetection": {
+      "files": [
+        "src/services/llm.service.ts",
+        "config/fraud-rules.yml",
+        "src/config/fraud-rules.ts"
+      ],
+      "description": "LLM-powered fraud detection and risk assessment system"
+    },
+    "caching": {
+      "files": [
+        "src/services/cache.service.ts",
+        "src/config/redis.ts"
+      ],
+      "description": "Redis-based caching layer for improved performance"
+    },
+    "resilience": {
+      "files": [
+        "src/utils/circuit-breaker.ts",
+        "src/utils/retry.ts"
+      ],
+      "description": "Circuit breaker and retry mechanisms for fault tolerance"
+    },
+    "logging": {
+      "files": [
+        "src/utils/logger.ts",
+        "src/utils/events.ts"
+      ],
+      "description": "Structured logging and event tracking system"
+    },
+    "validation": {
+      "files": [
+        "src/middleware/validation.middleware.ts",
+        "src/schemas/payment.schemas.ts"
+      ],
+      "description": "Request/response validation using Joi schemas"
+    },
+    "errorHandling": {
+      "files": [
+        "src/middleware/error.middleware.ts"
+      ],
+      "description": "Centralized error handling and response formatting"
+    }
+  },
+
+  "technologies": {
+    "runtime": "Node.js with TypeScript",
+    "framework": "Express.js",
+    "database": "Redis (caching and sessions)",
+    "validation": "Joi schemas",
+    "testing": "Jest with Supertest",
+    "documentation": "Swagger/OpenAPI 3.0",
+    "logging": "Winston",
+    "security": "Helmet, CORS, Rate limiting, JWT",
+    "containerization": "Docker & Docker Compose",
+    "llm": "External LLM API integration for risk assessment"
+  },
+
+  "apiEndpoints": {
+    "authentication": {
+      "POST /api/v1/auth/login": "User authentication",
+      "POST /api/v1/auth/register": "User registration",
+      "POST /api/v1/auth/refresh": "Token refresh"
+    },
+    "payments": {
+      "POST /api/v1/payments/process": "Process payment transaction",
+      "GET /api/v1/payments/status/:id": "Get payment status",
+      "GET /api/v1/payments/risk-summary/:id": "Get LLM risk assessment"
+    },
+    "health": {
+      "GET /health": "Service health check",
+      "GET /docs": "API documentation"
+    }
+  },
+
+  "environment": {
+    "development": {
+      "port": 3000,
+      "nodeEnv": "development",
+      "logLevel": "debug"
+    },
+    "production": {
+      "port": "${PORT}",
+      "nodeEnv": "production",
+      "logLevel": "info"
+    }
+  },
+
+  "scripts": {
+    "dev": "Development server with hot reload",
+    "build": "TypeScript compilation to dist/",
+    "start": "Production server startup",
+    "test": "Run Jest test suites",
+    "test:watch": "Jest in watch mode",
+    "test:coverage": "Generate test coverage reports",
+    "lint": "ESLint code analysis",
+    "docker:build": "Build Docker image",
+    "docker:run": "Start with Docker Compose"
+  },
+
+  "patterns": {
+    "controllerPattern": "Controllers handle HTTP requests and delegate to services",
+    "servicePattern": "Services contain business logic and external API calls",
+    "middlewarePattern": "Middleware handles cross-cutting concerns (auth, validation, errors)",
+    "repositoryPattern": "Services abstract data access and caching logic",
+    "circuitBreakerPattern": "Fault tolerance for external service calls",
+    "retryPattern": "Automatic retry with exponential backoff",
+    "validationPattern": "Joi schemas validate all incoming requests",
+    "errorHandlingPattern": "Centralized error handling with structured responses"
+  },
+
+  "dataFlow": {
+    "paymentRequest": "Client → Auth Middleware → Validation → Controller → Service → LLM/Cache → Response",
+    "fraudDetection": "Payment Data → LLM Service → Risk Analysis → Fraud Score → Decision",
+    "caching": "Request → Cache Check → Service Call (if miss) → Cache Store → Response",
+    "authentication": "Credentials → JWT Validation → User Context → Route Access"
+  },
+
+  "testing": {
+    "unit": "Jest unit tests for individual components",
+    "integration": "API endpoint testing with Supertest",
+    "coverage": "Code coverage reporting",
+    "mocking": "Mock services for external dependencies"
+  },
+
+  "deployment": {
+    "containerization": "Docker with multi-stage builds",
+    "orchestration": "Docker Compose for local development",
+    "environmentConfig": "Environment variables for configuration",
+    "healthChecks": "Built-in health check endpoints"
+  },
+
+  "codeConventions": {
+    "naming": "camelCase for variables, PascalCase for classes/interfaces",
+    "fileNaming": "kebab-case for file names with appropriate suffixes",
+    "imports": "Absolute imports from src/, relative for same directory",
+    "errorHandling": "Custom error classes with proper HTTP status codes",
+    "typing": "Strict TypeScript with explicit types for all functions",
+    "validation": "Joi schemas for all API inputs and outputs"
+  }
+}
