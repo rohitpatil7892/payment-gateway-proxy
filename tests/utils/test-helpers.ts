@@ -67,9 +67,11 @@ export const delay = (ms: number): Promise<void> => {
 };
 
 export const expectValidTransactionResponse = (response: any) => {
-  expect(response.success).toBe(true);
-  expect(response.data.transactionId).toMatch(/^txn_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
-  expect(response.data.status).toMatch(/^(PENDING|PROCESSING|SUCCESS|FAILED)$/);
+  expect(response.transactionId).toMatch(/^txn_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
+  expect(response.status).toMatch(/^(pending|processing|success|failed)$/);
+  expect(response.provider).toBeDefined();
+  expect(typeof response.riskScore).toBe('number');
+  expect(response.explanation).toBeDefined();
 };
 
 export const expectValidRiskAssessment = (riskAssessment: any) => {
@@ -112,5 +114,9 @@ export const TestData = {
   validAuthCredentials: createValidAuthRequest(),
   invalidClientId: createValidAuthRequest({ clientId: 'invalid-client' }),
   invalidClientSecret: createValidAuthRequest({ clientSecret: 'invalid-secret' }),
-  missingCredentials: { clientId: '', clientSecret: '' }
+  missingCredentials: { clientId: '', clientSecret: '' },
+  
+  // E2E test data
+  validBankTransferPayment: createValidPaymentRequest({ source: 'bank-transfer-source' }),
+  validDigitalWalletPayment: createValidPaymentRequest({ source: 'wallet-source' })
 };

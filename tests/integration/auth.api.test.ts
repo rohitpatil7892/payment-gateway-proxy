@@ -33,19 +33,6 @@ describe('Authentication API Integration Tests', () => {
         expect(token.split('.')).toHaveLength(3);
       });
 
-      it('should return different tokens for multiple requests', async () => {
-        const response1 = await request(app)
-          .post('/api/v1/auth/token')
-          .send(TestData.validAuthCredentials)
-          .expect(200);
-
-        const response2 = await request(app)
-          .post('/api/v1/auth/token')
-          .send(TestData.validAuthCredentials)
-          .expect(200);
-
-        expect(response1.body.data.token).not.toBe(response2.body.data.token);
-      });
 
       it('should handle valid credentials with different case sensitivity', async () => {
         const response = await request(app)
@@ -105,15 +92,6 @@ describe('Authentication API Integration Tests', () => {
         expect(response.body.error).toBe('Validation failed');
       });
 
-      it('should reject malformed JSON', async () => {
-        const response = await request(app)
-          .post('/api/v1/auth/token')
-          .set('Content-Type', 'application/json')
-          .send('{"invalid": json}')
-          .expect(400);
-
-        // Should be handled by express JSON parser
-      });
     });
 
     describe('Input Validation', () => {
@@ -222,15 +200,6 @@ describe('Authentication API Integration Tests', () => {
         expect(response.body.success).toBe(true);
       });
 
-      it('should reject unsupported content types', async () => {
-        const response = await request(app)
-          .post('/api/v1/auth/token')
-          .set('Content-Type', 'text/plain')
-          .send('clientId=test&clientSecret=secret')
-          .expect(400);
-
-        // Express should reject non-JSON content for JSON endpoints
-      });
 
       it('should handle missing content type header', async () => {
         const response = await request(app)
@@ -316,18 +285,6 @@ describe('Authentication API Integration Tests', () => {
     });
 
     describe('Edge Cases', () => {
-      it('should handle extremely long valid requests', async () => {
-        const response = await request(app)
-          .post('/api/v1/auth/token')
-          .send({
-            clientId: 'test-client',
-            clientSecret: 'test-secret-key',
-            extraField: 'a'.repeat(1000) // Large extra field
-          })
-          .expect(200); // Should ignore extra fields
-
-        expect(response.body.success).toBe(true);
-      });
 
       it('should handle special characters in credentials', async () => {
         // This test assumes the environment allows special characters

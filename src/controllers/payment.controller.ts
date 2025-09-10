@@ -116,42 +116,6 @@ export class PaymentController {
     }
   }
 
-  async listPayments(req: AuthenticatedRequest, res: Response): Promise<void> {
-    try {
-      const page = parseInt(req.query.page as string) || 1;
-      const limit = parseInt(req.query.limit as string) || 10;
-      const offset = (page - 1) * limit;
-
-      const allTransactions = Array.from(this.transactions.values());
-      const paginatedTransactions = allTransactions.slice(offset, offset + limit);
-
-      res.status(200).json({
-        success: true,
-        data: {
-          transactions: paginatedTransactions.map(t => ({
-            transactionId: t.id,
-            amount: t.amount,
-            currency: t.currency,
-            status: t.status,
-            createdAt: t.createdAt
-          })),
-          pagination: {
-            page,
-            limit,
-            total: allTransactions.length,
-            totalPages: Math.ceil(allTransactions.length / limit)
-          }
-        }
-      } as ApiResponse<any>);
-
-    } catch (error) {
-      logger.error('Failed to list payments', { error: (error as Error).message });
-      res.status(500).json({
-        success: false,
-        error: 'Failed to list payments'
-      } as ApiResponse<never>);
-    }
-  }
 }
 
 export const paymentController = new PaymentController();
